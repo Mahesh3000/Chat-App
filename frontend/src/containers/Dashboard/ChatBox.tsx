@@ -1,13 +1,22 @@
-import React, { memo } from 'react';
+import React from 'react';
 import Header from './Headers';
+import LeftSection from './LeftSection';
+import RightSection from './RightSection';
 
-const ChatBox = () => {
+const Chatbox = () => {
     return (
-        <div>
+        <div className="chatbox-container">
             <Header />
-            homaljsdhj
+            <div className="content">
+                <div className="left-section">
+                    <LeftSection />
+                </div>
+                <div className="right-section">
+                    <RightSection />
+                </div>
+            </div>
         </div>
     );
 };
 
-export default ChatBox;
+export default Chatbox;

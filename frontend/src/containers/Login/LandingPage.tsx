@@ -5,7 +5,7 @@ import BackgroundImage from '../../assets/bg.png'
 const LandingPage = () => {
     return (
         <header style={HeaderStyle}>
-            <h1 className="main-title text-center">Welcome to ChatVerse</h1>
+            <h1 className="main-title text-center">Welcome to Pingify</h1>
             <p className="main-para text-center">Connect with friends and the world instantly</p>
             <div className="buttons text-center">
                 <Link to="/login">
