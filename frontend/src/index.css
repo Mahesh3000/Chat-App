@@ -20,7 +20,7 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.header {
+.login-header {
   text-align: center;
   margin-bottom: 20px;
   padding: 20px;
@@ -272,6 +272,7 @@ right: 0;
   left: 0;
   right: 0;
   z-index: 1000;
+  margin-bottom: 20px;
 }
 
 /* User info section */
@@ -440,101 +441,118 @@ right: 0;
   flex-direction: column;
   height: 100vh;
   border-left: 1px solid #ddd;
-  padding: 20px;
+  padding: 30px;
   box-sizing: border-box;
+ margin-top: 20px;
 }
 
-/* Message Container */
-.right-section .messages-container {
-  flex-grow: 1;
-  overflow-y: auto; /* Enables vertical scrolling */
-  padding: 10px;
-  margin-bottom: 20px;
-  background-color: #f7f7f7;
-  border-radius: 8px;
-  max-height: 80vh; /* Set a max height for the message area */
-  box-sizing: border-box; /* Prevents overflow of content */
-}
-
-/* Message Styles */
-.right-section .message {
-  margin: 10px 0;
+.right-section-container {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  height: 100%; /* Use full height of the parent container */
 }
 
-.right-section .message .message-content {
-  max-width: 60%;
+.messages-container {
+  flex: 1; /* Take up all available space */
+  overflow-y: auto; /* Enable scrolling for messages */
   padding: 10px;
-  border-radius: 10px;
-  font-size: 16px;
+  background-color: #f9f9f9;
 }
 
-/* Sent Message (Right) */
-.right-section .message.sent .message-content {
-  background-color: #4caf50; /* Green for sent messages */
-  color: white;
-  align-self: flex-end;
-  margin-left: auto; /* Align to the right */
-}
-
-/* Received Message (Left) */
-.right-section .message.received .message-content {
-  background-color: #f1f1f1; /* Light gray for received messages */
-  color: #333;
-  align-self: flex-start;
-  margin-right: auto; /* Align to the left */
-}
-
-/* Message Input */
-.right-section .message-input {
+.message-input {
   display: flex;
   align-items: center;
-  padding-top: 10px;
-}
-
-.right-section .attachment-button,
-.right-section .send-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 24px;
-  color: #007bff;
-  margin-right: 10px;
-  transition: color 0.3s ease;
-}
-
-.right-section .attachment-button:hover,
-.right-section .send-button:hover {
-  color: #0056b3;
-}
-
-.right-section .input-message {
-  width: 100%;
   padding: 10px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
 }
 
-.right-section .send-button {
-  font-size: 20px; /* Adjust size for send icon */
+.attachment-button {
+  margin-right: 10px;
+  cursor: pointer;
 }
 
-/* Icon Styling */
-.fas {
-  pointer-events: none; /* Prevent interaction with the icons */
+.input-message {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
-.right-section .send-button {
-  font-size: 20px; /* Adjust size for send icon */
+.send-button {
+  margin-left: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
 }
 
-/* Icon Styling */
-.fas {
-  pointer-events: none; /* Prevent interaction with the icons */
+.my-message {
+  text-align: right;
+  background-color: #d1ffd1;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.received-message {
+  text-align: left;
+  background-color: #e1e1e1;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 
+.error-message {
+  color: #d9534f; /* Bootstrap's danger color */
+  background-color: #f8d7da; /* Light red background */
+  border: 1px solid #f5c6cb; /* Light red border */
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.error-message a {
+  color: #d9534f;
+  text-decoration: underline;
+}
+
+
+.left-avatar {
+  width: 40px; /* Set desired width */
+  height: 40px; /* Set desired height */
+  border-radius: 50%; /* Make it circular */
+  object-fit: cover; /* Ensure the image scales properly */
+}
+
+.user-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  border: 2px solid white; /* Border to separate from avatar */
+}
+
+.status-indicator.online {
+  background-color: green;
+}
+
+.status-indicator.offline {
+  background-color: gray;
+}
 
 /* RightSection Ends here */

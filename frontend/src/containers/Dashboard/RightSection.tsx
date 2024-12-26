@@ -1,57 +1,66 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
 
-const RightSection = () => {
-    const [message, setMessage] = useState('');
+// Replace with your backend server URL
+const SOCKET_SERVER_URL = "http://localhost:5000";
 
-    // Dummy messages data
-    const messages = [
-        { id: 1, sender: 'John Doe', content: 'Hello, how are you?', isMine: false },
-        { id: 2, sender: 'You', content: 'I am good, thanks!', isMine: true },
-        { id: 3, sender: 'John Doe', content: 'Great to hear!', isMine: false },
-        { id: 4, sender: 'You', content: 'What about you?', isMine: true },
-        { id: 5, sender: 'John Doe', content: 'I am doing well, thanks for asking!', isMine: false },
-        { id: 3, sender: 'John Doe', content: 'Great to hear!', isMine: false },
-        { id: 4, sender: 'You', content: 'What about you?', isMine: true },
-        { id: 5, sender: 'John Doe', content: 'I am doing well, thanks for asking!', isMine: false },
-    ];
+interface Message {
+    text: string;
+    sender: string;
+}
 
-    const handleMessageChange = (e) => {
+const RightSection: React.FC = () => {
+    const [socket, setSocket] = useState<Socket | null>(null);
+    const [message, setMessage] = useState<string>("");
+    const [messages, setMessages] = useState<Message[]>([]);
+
+    // useEffect(() => {
+    //     const newSocket = io(SOCKET_SERVER_URL);
+    //     setSocket(newSocket);
+
+    //     return () => newSocket.disconnect();
+    // }, []);
+
+    // useEffect(() => {
+    //     if (socket) {
+    //         socket.on("receive_message", (data: Message) => {
+    //             setMessages((prevMessages) => [...prevMessages, data]);
+    //         });
+    //     }
+    // }, [socket]);
+
+    const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(e.target.value);
     };
 
-    const handleSendMessage = (e) => {
+    const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (message.trim() !== '') {
-            // Adding the new message to the messages array (just for demonstration)
-            const newMessage = { id: messages.length + 1, sender: 'You', content: message, isMine: true };
-            messages.push(newMessage);
-            setMessage(''); // Clear the input
+        if (message.trim() && socket) {
+            const newMessage: Message = { text: message, sender: "You" };
+            socket.emit("send_message", newMessage);
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+            setMessage("");
         }
     };
 
     return (
-        <div className="right-section">
+        <div className="right-section-container">
             <div className="messages-container">
-                {messages.map((msg) => (
+                {messages.map((msg, index) => (
                     <div
-                        key={msg.id}
-                        className={`message ${msg.isMine ? 'sent' : 'received'}`}
+                        key={index}
+                        className={msg.sender === "You" ? "my-message" : "received-message"}
                     >
-                        <div className="message-content">
-                            <p>{msg.content}</p>
-                        </div>
+                        {msg.text}
                     </div>
                 ))}
             </div>
 
-            {/* Message input with icons */}
-            <form className="message-input" onSubmit={handleSendMessage}>
-                {/* Attachment Icon */}
-                <button type="button" className="attachment-button">
+            <form className="message-input" onSubmit={sendMessage}>
+                <label className="attachment-button">
                     <i className="fas fa-paperclip"></i>
-                </button>
-
-                {/* Input field */}
+                    <input type="file" style={{ display: 'none' }} />
+                </label>
                 <input
                     type="text"
                     value={message}
@@ -59,8 +68,6 @@ const RightSection = () => {
                     placeholder="Type a message..."
                     className="input-message"
                 />
-
-                {/* Send Icon */}
                 <button type="submit" className="send-button">
                     <i className="fas fa-paper-plane"></i>
                 </button>

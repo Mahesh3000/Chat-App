@@ -1,57 +1,80 @@
+import axios, { AxiosError } from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// import { auth, firestore, storage } from './firebase';
-// import { createUserWithEmailAndPassword } from 'firebase/auth';
-// import { doc, setDoc } from 'firebase/firestore';
-// import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-// import '../styles/signup.css';
 
-function SignUp() {
+const SignUp = () => {
     const navigate = useNavigate();
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [profilePic, setProfilePic] = useState(null);
+    const [profilePic, setProfilePic] = useState<File | null>(null);
 
-    const handleProfilePicChange = (e) => {
-        setProfilePic(e.target.files[0]);
-    };
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = async (e) => {
+    const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const file = e.target.files[0];
+            setProfilePic(file)
+        }
+    }
+
+    console.log('file', profilePic);
+
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        // Check if passwords match
         if (password !== confirmPassword) {
-            console.log("Passwords do not match");
+            alert("Passwords do not match!");
             return;
         }
 
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('confirmPassword', confirmPassword);
+        if (profilePic) {
+            formData.append('profilePic', profilePic);
+        }
+
+
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            let profilePicUrl = '';
-
-            if (profilePic) {
-                const profilePicRef = ref(storage, `profile_pics/${user.uid}`);
-                await uploadBytes(profilePicRef, profilePic);
-                profilePicUrl = await getDownloadURL(profilePicRef);
-            }
-
-            await setDoc(doc(firestore, 'users', user.uid), {
-                username,
-                email,
-                profilePicUrl,
+            const response = await axios.post('http://localhost:4000/auth/signup', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
 
-            console.log("User registered:", user);
+            if (response.status === 201) {
+                navigate('/login');
+            }
+            else {
+                setError(response.data.message || "Sign up failed. Please try again.");
+            }
+        } catch (error: unknown) {
+            console.error('Error during signup:', error);
 
-            navigate('/');
-        } catch (error) {
-            console.error("Error signing up:", error.message);
+            if (axios.isAxiosError(error)) {
+                // Check if the error has a response
+                if (error.response) {
+                    // Error response data structure example: { message: "Some error message" }
+                    setError(error.response.data.message || "An error occurred during signup. Please try again.");
+                } else {
+                    // If no response, maybe a network error
+                    setError("Network error. Please check your internet connection.");
+                }
+            } else {
+                // If the error isn't an AxiosError, handle it as a generic error
+                setError("An unexpected error occurred. Please try again.");
+            }
+
         }
     };
+
 
     return (
         <div className="containeryash">
@@ -107,6 +130,7 @@ function SignUp() {
                         accept="image/*"
                     />
                     <button type="submit" className="btn btn-primary">Sign Up</button>
+                    {error && <div className="error-message">{error}</div>}
                     <Link to="/login" className="already-registered-text">Go to Login</Link>
                 </form>
             </div>
