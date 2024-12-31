@@ -1,12 +1,15 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 // import { auth } from './firebase';
 // import { signInWithEmailAndPassword } from 'firebase/auth';
 // import '../styles/login.css';
+import { setUserData } from '../../redux'
 
 const Login = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -26,7 +29,9 @@ const Login = () => {
             const response = await axios.post('http://localhost:4000/auth/login', { email, password });
 
             if (response.status === 200) {
-                localStorage.setItem(response?.data?.user?.username, JSON.stringify(response?.data));
+                localStorage.setItem('user', JSON.stringify(response?.data));
+                dispatch(setUserData(response?.data));
+
                 navigate('/dashboard');
             }
         } catch (error: unknown) {

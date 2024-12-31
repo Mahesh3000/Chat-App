@@ -454,9 +454,30 @@ right: 0;
 
 .messages-container {
   flex: 1; /* Take up all available space */
+  display: flex; /* Enable flexbox layout */
+  flex-direction: column;
   overflow-y: auto; /* Enable scrolling for messages */
   padding: 10px;
   background-color: #f9f9f9;
+}
+
+
+.no-messages-container {
+  text-align: center;
+  margin-top: 90px;
+  /* display: flex; */
+  align-items: center;
+}
+
+.no-messages-image {
+  width: 250px; /* Adjust as needed */
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.no-messages-text {
+  font-size: 16px;
+  color: #666;
 }
 
 .message-input {
@@ -555,4 +576,20 @@ right: 0;
   background-color: gray;
 }
 
+.timestamp{
+  font-size: 0.8em;
+  color: gray;
+}
+
+.no-messages-text {
+  text-align: center;
+  align-items: center;
+  color: gray;
+  font-style: italic;
+  margin-top: 20px;
+}
+
+
+
 /* RightSection Ends here */
+

@@ -11,17 +11,20 @@ interface User {
 
 interface LeftSectionProps {
     userslist: User[] | null; // Array of `User` objects or `null`
+    onUserClick: (userId: string | number) => void; // Callback for user click
 }
 
-const LeftSection: React.FC<LeftSectionProps> = ({ userslist }) => {
+const LeftSection: React.FC<LeftSectionProps> = ({ userslist, onUserClick }) => {
 
-    console.log("userslist", userslist);
+
 
     return (
         <div>
             {userslist ? (
                 userslist.map((user) => (
-                    <div key={user.id} className="user-item">
+                    <div key={user.id} className="user-item"
+                        onClick={() => onUserClick(user.id)} // Trigger callback on click
+                    >
                         <div className="user-icon">
                             {/* Fallback to FaUserAlt if no profile picture is available */}
                             {user?.profile_pic ? (

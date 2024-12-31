@@ -45,28 +45,29 @@ const insertUser = async (username, email, hashedPassword, profilePic) => {
 
 const getAllUsers = async () => {
   const query = "SELECT id, username, profile_pic FROM users";
+
   const result = await dbClient.query(query);
   return result.rows;
 };
 
-const getMessagesForConversation = async (conversationId) => {
+const getMessagesForConversation = async (userId, otherUserId) => {
   const query = `
-    SELECT messages.id, messages.message, messages.created_at, users.username
+    SELECT id, sender_id, receiver_id, message, timestamp
     FROM messages
-    JOIN users ON users.id = messages.user_id
-    WHERE messages.conversation_id = $1
-    ORDER BY messages.created_at ASC
+    WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1)
+    ORDER BY timestamp ASC
   `;
-  const result = await dbClient.query(query, [conversationId]);
+  const result = await dbClient.query(query, [userId, otherUserId]);
   return result.rows;
 };
 
-const sendMessage = async (conversationId, userId, message) => {
+const sendMessage = async (senderId, receiverId, message) => {
   const query = `
-    INSERT INTO messages (conversation_id, user_id, message)
-    VALUES ($1, $2, $3) RETURNING id, message, created_at
+    INSERT INTO messages (sender_id, receiver_id, message, timestamp)
+    VALUES ($1, $2, $3, NOW())
+    RETURNING id, sender_id, receiver_id, message, timestamp
   `;
-  const result = await dbClient.query(query, [conversationId, userId, message]);
+  const result = await dbClient.query(query, [senderId, receiverId, message]);
   return result.rows[0];
 };
 

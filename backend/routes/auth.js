@@ -1,9 +1,10 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { connectDB, getUserByEmail, insertUser } = require("../db");
+const { connectDB, getUserByEmail, insertUser, getAllUsers } = require("../db");
 const multer = require("multer");
 const path = require("path");
+const authenticateUser = require("../middleware/authenticateUser");
 
 const router = express.Router();
 
@@ -122,6 +123,44 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     console.error("Error during login:", err);
     return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// router.get("/users", authenticateUser, getAllUsers);
+
+// Endpoint to fetch messages for a specific user
+router.get("/messages/:userId", async (req, res) => {
+  const { userId } = req.params;
+  console.log("userId", userId);
+
+  try {
+    // Query to fetch messages for the user
+    const query = `
+          SELECT 
+              m.id AS message_id, 
+              m.text AS message_text, 
+              m.sender_id, 
+              m.receiver_id, 
+              m.timestamp
+          FROM messages m
+          WHERE m.sender_id = $1 OR m.receiver_id = $1
+          ORDER BY m.timestamp ASC
+      `;
+    const result = await db.query(query, [userId]);
+
+    // Format the result
+    const messages = result.rows.map((row) => ({
+      id: row.message_id,
+      text: row.message_text,
+      sender: row.sender_id,
+      receiver: row.receiver_id,
+      timestamp: row.timestamp,
+    }));
+
+    res.json(messages);
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    res.status(500).json({ error: "Error fetching messages" });
   }
 });
 

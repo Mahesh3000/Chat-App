@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 interface HeaderProps {
@@ -7,8 +7,8 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ users }) => {
-    console.log('users', users);
-
+    // console.log('users', users);
+    const navigate = useNavigate()
     const userName = users ? users.user.username : 'mahesh'
 
     // const avatarUrl = users ? users?.user?.profilePic : "/default-avatar.jpg";
@@ -16,8 +16,10 @@ const Header: React.FC<HeaderProps> = ({ users }) => {
 
 
 
-    console.log('avatarUrl', avatarUrl);
-
+    const handleLogout = () => {
+        navigate('/')
+        localStorage.removeItem('user')
+    }
 
     return (
         <header className="chat-header">
@@ -26,9 +28,9 @@ const Header: React.FC<HeaderProps> = ({ users }) => {
                 <span className="username">{userName}</span>
             </div>
             <h1 className="app-title">Pingify</h1>
-            <Link to="/login" >
-                <button className="logout-btn">Logout</button>
-            </Link>
+            {/* <Link to="/login" > */}
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
+            {/* </Link> */}
         </header>
     );
 };
