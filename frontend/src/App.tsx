@@ -11,6 +11,7 @@ import Signup from './containers/Login/Signup';
 import ForgetPasswordPage from './containers/Login/ForgetPassword';
 import LandingPage from './containers/Login/LandingPage';
 import ChatBox from './containers/Dashboard/ChatBox';
+import ProtectedRoute from './containers/Login/ProtectedRoute';
 
 function App() {
 
@@ -23,7 +24,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forget-password" element={<ForgetPasswordPage />} />
-          <Route path="/dashboard" element={<ChatBox />} />
+          <Route
+            path="/dashboard"
+            element={<ProtectedRoute element={<ChatBox />} />}
+          />
         </Routes>
       </Router>
     </>
@@ -31,8 +35,3 @@ function App() {
 }
 
 export default App
-//   < Route exact path = "/" component = { LandingPage } />
-// <Route path="/login" component={ LoginPage } />
-// <Route path="/register" component={ RegisterPage } />
-// <Route path="/forget-password" component={ ForgetPasswordPage } />
-// <Route path="/home" component={ HomePage } />

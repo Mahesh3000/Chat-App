@@ -30,8 +30,8 @@ const Login = () => {
 
             if (response.status === 200) {
                 localStorage.setItem('user', JSON.stringify(response?.data));
+                localStorage.setItem("authToken", response?.data?.token);
                 dispatch(setUserData(response?.data));
-
                 navigate('/dashboard');
             }
         } catch (error: unknown) {

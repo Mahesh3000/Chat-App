@@ -66,17 +66,12 @@ const Chatbox = () => {
 
     const handleUserClick = async (userId: string | number) => {
         setSelectedUserId(userId);
-
-        // // Fetch messages for the selected user
-        // const response = await fetch(`http://localhost:4000/messages/${userId}`);
-        // const data = await response.json();
-        // setMessages(data);
     };
 
-    console.log('users', users);
+    // console.log('users', users);
     const filteredUsers = users?.filter(us => us.id !== user?.user?.id)
 
-    console.log('filteredUsers', filteredUsers);
+    console.log('selectedUserId', selectedUserId);
 
     return (
         <div className="chatbox-container">

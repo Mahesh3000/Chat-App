@@ -1,21 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
-import rightBg from '../../assets/rightBg.png'
+import rightBg from '../../assets/rightBg.png';
 
-// Replace with your backend server URL
 const SOCKET_SERVER_URL = "http://localhost:4000";
 
 type Message = {
     id: string;
     senderId: string;
-    receiver_id: string;
+    receiverId: string;
     message: string;
     timestamp: string;
 };
 
 interface RightSectionProps {
-    currentUserId: string; // Current user's ID
-    otherUser: string; // Other user's ID
+    currentUserId: string;
+    otherUser: string;
 }
 
 const RightSection: React.FC<RightSectionProps> = ({ currentUserId, otherUser }) => {
@@ -23,47 +22,44 @@ const RightSection: React.FC<RightSectionProps> = ({ currentUserId, otherUser })
     const [message, setMessage] = useState<string>("");
     const [messages, setMessages] = useState<Message[]>([]);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    console.log('otherUser', otherUser, 'currentUserId', currentUserId);
 
-    // Socket setup
+    // Socket setup: Ensure socket stays open and listens for new messages
     useEffect(() => {
-        if (socket) {
-            socket.disconnect();
-        }
-
         const newSocket = io(SOCKET_SERVER_URL);
         setSocket(newSocket);
 
-        // Load previous messages
+        // Emit join_conversation to create a room with the current conversation
+        newSocket.emit("join_conversation", { senderId: currentUserId, receiverId: otherUser });
+
+        // Listen for previous messages
         newSocket.on("load_messages", (loadedMessages: Message[]) => {
             setMessages(loadedMessages);
         });
 
-        // Receive new messages
+        // Listen for new messages in real-time
         newSocket.on("receive_message", (msg: Message) => {
             setMessages((prevMessages) => [...prevMessages, msg]);
         });
-        // Request messages for the conversation
-        newSocket.emit("get_messages", { userId: currentUserId, otherUserId: otherUser });
 
+        // Cleanup socket connection on unmount
         return () => {
             newSocket.disconnect();
         };
     }, [currentUserId, otherUser]);
 
-
+    // Scroll to bottom when new messages arrive
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
-    }, [messages, otherUser]);
-
-
+    }, [messages]);
 
     const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(e.target.value);
     };
 
-    // Send message
+    // Send message: emit the message to the backend and update UI optimistically
     const sendMessage = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
@@ -75,10 +71,10 @@ const RightSection: React.FC<RightSectionProps> = ({ currentUserId, otherUser })
                     message,
                 };
 
-                // Emit message to backend
+                // Emit the message to the backend
                 socket.emit("send_message", newMessage);
 
-                // Optimistically add message to the UI
+                // Optimistically update the UI with the new message
                 setMessages((prevMessages) => [
                     ...prevMessages,
                     { ...newMessage, id: `${Date.now()}`, timestamp: new Date().toISOString() },
@@ -90,13 +86,10 @@ const RightSection: React.FC<RightSectionProps> = ({ currentUserId, otherUser })
         [message, socket, currentUserId, otherUser]
     );
 
-    console.log('currentUserId', currentUserId);
-    console.log("messages", messages);
-
     return (
         <div className="right-section-container">
             <div className="messages-container">
-                {messages?.length > 0 ? (
+                {messages.length > 0 ? (
                     messages.map((msg) => (
                         <div
                             key={msg.id}
@@ -107,24 +100,18 @@ const RightSection: React.FC<RightSectionProps> = ({ currentUserId, otherUser })
                                 {new Date(msg.timestamp).toLocaleTimeString()}
                             </div>
                         </div>
-                    ))) : (
+                    ))
+                ) : (
                     <div className="no-messages-container">
-                        <img
-                            src={rightBg}
-                            alt="No messages"
-                            className="no-messages-image"
-                        />
+                        <img src={rightBg} alt="No messages" className="no-messages-image" />
                         <p className="no-messages-text">Send and receive messages without keeping your phone online.</p>
                     </div>
                 )}
+                {/* This is the "dummy" div used to trigger the scroll to bottom */}
+                {/* <div ref={messagesEndRef} /> */}
             </div>
-            {/* <div ref={messagesEndRef} /> */}
 
             <form className="message-input" onSubmit={sendMessage}>
-                <label className="attachment-button">
-                    <i className="fas fa-paperclip"></i>
-                    <input type="file" style={{ display: "none" }} />
-                </label>
                 <input
                     type="text"
                     value={message}
@@ -141,4 +128,3 @@ const RightSection: React.FC<RightSectionProps> = ({ currentUserId, otherUser })
 };
 
 export default RightSection;
-

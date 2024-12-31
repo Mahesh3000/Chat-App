@@ -459,6 +459,7 @@ right: 0;
   overflow-y: auto; /* Enable scrolling for messages */
   padding: 10px;
   background-color: #f9f9f9;
+  scroll-behavior: smooth; /* Ensures smooth scroll */
 }
 
 
