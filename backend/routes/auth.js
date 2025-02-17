@@ -31,9 +31,60 @@ const upload = multer({
   //   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
 });
 
-router.post("/signup", upload.single("profilePic"), async (req, res) => {
-  console.log("Received data:", req.body);
+// router.post("/signup", upload.single("avatar_url"), async (req, res) => {
+//   const { username, email, password, confirmPassword } = req.body;
+//   // const profilePic = req.file ? `/uploads/${req.file.filename}` : null; // Handle profilePic URL if a file is uploaded
 
+//   // Check if passwords match
+//   if (password !== confirmPassword) {
+//     return res.status(400).json({ message: "Passwords do not match" });
+//   }
+
+//   // Check if essential fields are provided
+//   if (!username || !email || !password) {
+//     return res
+//       .status(400)
+//       .json({ message: "Username, email, and password are required" });
+//   }
+
+//   try {
+//     // Check if user already exists
+//     const user = await getUserByEmail(email);
+//     if (user) {
+//       return res.status(400).json({ message: "Email is already in use" });
+//     }
+//     console.log("user", user);
+
+//     // Hash the password
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     // Insert the new user into the database
+//     const newUser = await insertUser(
+//       username,
+//       email,
+//       hashedPassword,
+//       profilePic
+//     );
+
+//     // Respond with success message
+//     return res.status(201).json({
+//       message: "User created successfully",
+//       user: {
+//         id: newUser.id,
+//         username: newUser.username,
+//         email: newUser.email,
+//         profilePic: newUser.profile_pic, // Include profile pic URL if available
+//       },
+//     });
+//   } catch (err) {
+//     console.error("Error during signup:", err);
+//     return res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+// Login route
+
+router.post("/signup", upload.single("avatar_url"), async (req, res) => {
   const { username, email, password, confirmPassword } = req.body;
   const profilePic = req.file ? `/uploads/${req.file.filename}` : null; // Handle profilePic URL if a file is uploaded
 
@@ -51,14 +102,15 @@ router.post("/signup", upload.single("profilePic"), async (req, res) => {
 
   try {
     // Check if user already exists
-    const user = await getUserByEmail(email);
-    if (user) {
-      return res.status(400).json({ message: "Email is already in use" });
-    }
+    // const user = await getUserByEmail(email);
+    // if (user) {
+    //   return res.status(400).json({ message: "Email is already in use" });
+    // }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    console.log("user", hashedPassword);
     // Insert the new user into the database
     const newUser = await insertUser(
       username,
@@ -74,7 +126,7 @@ router.post("/signup", upload.single("profilePic"), async (req, res) => {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
-        profilePic: newUser.profile_pic, // Include profile pic URL if available
+        avatar_url: newUser.avatar_url, // Ensure correct key name
       },
     });
   } catch (err) {
@@ -82,7 +134,7 @@ router.post("/signup", upload.single("profilePic"), async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
-// Login route
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 

@@ -31,15 +31,19 @@ const getUserByEmail = async (email) => {
 // Function to insert a new user into the database
 const insertUser = async (username, email, hashedPassword, profilePic) => {
   const query = `
-      INSERT INTO users (username, email, password, profile_pic)
-      VALUES ($1, $2, $3, $4) RETURNING id, username, email
+      INSERT INTO users (id, username, email, password, avatar_url)
+      VALUES (uuid_generate_v4(), $1, $2, $3, $4) 
+      RETURNING id, username, email, avatar_url, created_at;
   `;
   const result = await dbClient.query(query, [
     username,
     email,
     hashedPassword,
-    profilePic,
+    profilePic || null, // Ensure NULL if no profile pic is provided
   ]);
+
+  console.log("result", result);
+
   return result.rows[0];
 };
 

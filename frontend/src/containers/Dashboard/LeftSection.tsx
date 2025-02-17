@@ -2,11 +2,11 @@ import React from 'react';
 import { FaUserAlt } from 'react-icons/fa';
 
 interface User {
-    id: string | number; // Adjust based on your data
-    profile_pic?: string;
+    _id: string | number; // Adjusted based on the provided data
+    image?: string | null;
     username: string;
     email: string;
-    status: string; // e.g., 'online', 'offline'
+    is_online: string; // This is the status ('0' for offline, '1' for online)
 }
 
 interface LeftSectionProps {
@@ -15,34 +15,43 @@ interface LeftSectionProps {
 }
 
 const LeftSection: React.FC<LeftSectionProps> = ({ userslist, onUserClick }) => {
+    if (!userslist || userslist.length === 0) {
+        return <p>No users available</p>;
+    }
 
+    // console.log('userslist', userslist);
 
 
     return (
-        <div>
-            {userslist ? (
-                userslist.map((user) => (
-                    <div key={user.id} className="user-item"
-                        onClick={() => onUserClick(user.id)} // Trigger callback on click
-                    >
-                        <div className="user-icon">
-                            {/* Fallback to FaUserAlt if no profile picture is available */}
-                            {user?.profile_pic ? (
-                                <img src={`http://localhost:4000${user?.profile_pic}`} alt="User Avatar" className="left-avatar" />
-                            ) : (
-                                <FaUserAlt size={30} />
-                            )}
-                            <div className={`status-indicator ${user.status}`}></div>
-                        </div>
-                        <div className="user-details">
-                            <h1>{user.username}</h1>
-                            <span>{user.email}</span>
-                        </div>
+        <div className="users-list">
+            {userslist.map((user) => (
+                <div
+                    key={user._id} // Use _id instead of id
+                    className="user-item"
+                    onClick={() => onUserClick(user._id)} // Pass _id on click
+                >
+                    <div className="user-icon">
+                        {/* Use user profile image or default icon */}
+                        {user.image ? (
+                            <img
+                                // src={user.image}
+                                src={`http://localhost:5001${user.image}`}
+
+                                alt={`${user.username} avatar`}
+                                className="left-avatar"
+                            />
+                        ) : (
+                            <FaUserAlt size={30} />
+                        )}
+                        <div className={`status-indicator ${user.is_online === "1" ? 'online' : 'offline'}`} />
                     </div>
-                ))
-            ) : (
-                <p>No users available</p>
-            )}
+
+                    <div className="user-details">
+                        <h1>{user.username}</h1>
+                        <span>{user.email}</span>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 };

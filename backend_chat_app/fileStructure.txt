@@ -1,0 +1,43 @@
+chat-app/
+│── backend/
+│   ├── api-gateway/         # Handles authentication & routes requests
+│   │   ├── src/
+│   │   │   ├── routes/
+│   │   │   │   ├── auth.ts  # Auth API routes
+│   │   │   ├── app.ts       # Express app setup
+│   │   │   ├── index.ts     # Server entry point
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   ├── services/
+│   │   ├── auth-service/
+│   │   │   ├── src/
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── User.ts
+│   │   │   │   ├── routes/
+│   │   │   │   │   ├── auth.ts
+│   │   │   │   ├── index.ts
+│   │   │   ├── package.json
+│   │   │   ├── .env
+│   │   ├── chat-service/
+│   │   │   ├── src/
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── Message.ts
+│   │   │   │   ├── index.ts
+│   │   │   ├── package.json
+│   │   ├── media-service/
+│   │   │   ├── src/
+│   │   │   │   ├── index.ts
+│   │   │   ├── package.json
+│── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ChatBox.tsx
+│   │   │   ├── Login.tsx
+│   │   ├── pages/
+│   │   │   ├── Home.tsx
+│   │   │   ├── Chat.tsx
+│   │   ├── App.tsx
+│   ├── package.json
+│   ├── vite.config.ts
+│── docker-compose.yml
+│── .env

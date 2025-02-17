@@ -24,9 +24,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forget-password" element={<ForgetPasswordPage />} />
-          <Route
+          {/* <Route
             path="/dashboard"
             element={<ProtectedRoute element={<ChatBox />} />}
+          /> */}
+          <Route
+            path="/dashboard"
+            element={<ChatBox />}
           />
         </Routes>
       </Router>

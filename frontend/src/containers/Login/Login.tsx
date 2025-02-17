@@ -1,50 +1,45 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-// import { auth } from './firebase';
-// import { signInWithEmailAndPassword } from 'firebase/auth';
-// import '../styles/login.css';
-import { setUserData } from '../../redux'
+import axios from "axios";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { setUserData } from "../../redux";
 
 const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({ email: "", password: "" });
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError(null)
+    };
+
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         setError(null);
-        if (!email || !password) {
-            setError('Both email and password are required.');
-            return;
+
+        if (!formData.email || !formData.password) {
+            return setError("Both email and password are required.");
         }
+
         try {
             setLoading(true);
-            const response = await axios.post('http://localhost:4000/auth/login', { email, password });
+            const { data, status } = await axios.post("http://localhost:5001/auth/login", formData);
 
-            if (response.status === 200) {
-                localStorage.setItem('user', JSON.stringify(response?.data));
-                localStorage.setItem("authToken", response?.data?.token);
-                dispatch(setUserData(response?.data));
-                navigate('/dashboard');
+            if (status === 200) {
+                localStorage.setItem("user", JSON.stringify(data));
+                localStorage.setItem("authToken", data.token);
+                dispatch(setUserData(data));
+                navigate("/dashboard");
             }
-        } catch (error: unknown) {
-            console.error('Error during login:', error);
-
+        } catch (error) {
             if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setError(error.response.data.message || 'Login failed. Please try again.');
-                } else {
-                    setError('Network error. Please check your internet connection.');
-                }
+                setError(error.response?.data?.message || "Login failed. Please try again.");
             } else {
-                setError('An unexpected error occurred. Please try again.');
+                setError("An unexpected error occurred. Please try again.");
             }
         } finally {
             setLoading(false);
@@ -56,37 +51,127 @@ const Login = () => {
             <div className="login-form">
                 <h2 className="login-header">Login</h2>
                 <form onSubmit={handleLogin}>
-                    <input
-                        type="email"
-                        className="form"
-                        id="email"
-                        name="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Email"
-                        required
-                    />
-                    <input
-                        type="password"
-                        className="form"
-                        id="password"
-                        name="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
-                        required
-                    />
-                    <Link to="/forget-password"><label className="right-label">Forget password?</label></Link>
+                    {["email", "password"].map((field) => (
+                        <input
+                            key={field}
+                            type={field === "password" ? "password" : "email"}
+                            className="form"
+                            name={field}
+                            value={formData[field as keyof typeof formData]}
+                            onChange={handleChange}
+                            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                        />
+                    ))}
 
-                    <button type="submit" className="btn btn-primary">Login</button>
+                    <Link to="/forget-password">
+                        <label className="right-label">Forgot password?</label>
+                    </Link>
+
+                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
+
                     {error && <div className="error-message">{error}</div>}
 
                     <Link to="/signup" className="already-registered-text">Go to Signup</Link>
                 </form>
-                {error && <div className="alert alert-danger mt-3">{error}</div>}
             </div>
         </div>
     );
-}
+};
 
 export default Login;
+
+
+// import axios from 'axios';
+// import React, { useState } from 'react';
+// import { useDispatch } from 'react-redux';
+// import { Link, useNavigate } from 'react-router-dom';
+// // import { auth } from './firebase';
+// // import { signInWithEmailAndPassword } from 'firebase/auth';
+// // import '../styles/login.css';
+// import { setUserData } from '../../redux'
+
+// const Login = () => {
+//     const navigate = useNavigate();
+//     const dispatch = useDispatch();
+
+//     const [email, setEmail] = useState('');
+//     const [password, setPassword] = useState('');
+//     const [error, setError] = useState<string | null>(null);
+//     const [loading, setLoading] = useState(false);
+
+//     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+//         e.preventDefault();
+
+//         setError(null);
+//         if (!email || !password) {
+//             setError('Both email and password are required.');
+//             return;
+//         }
+//         try {
+//             setLoading(true);
+//             const response = await axios.post('http://localhost:4000/auth/login', { email, password });
+
+//             if (response.status === 200) {
+//                 localStorage.setItem('user', JSON.stringify(response?.data));
+//                 localStorage.setItem("authToken", response?.data?.token);
+//                 dispatch(setUserData(response?.data));
+//                 navigate('/dashboard');
+//             }
+//         } catch (error: unknown) {
+//             console.error('Error during login:', error);
+
+//             if (axios.isAxiosError(error)) {
+//                 if (error.response) {
+//                     setError(error.response.data.message || 'Login failed. Please try again.');
+//                 } else {
+//                     setError('Network error. Please check your internet connection.');
+//                 }
+//             } else {
+//                 setError('An unexpected error occurred. Please try again.');
+//             }
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     return (
+//         <div className="containeryash">
+//             <div className="login-form">
+//                 <h2 className="login-header">Login</h2>
+//                 <form onSubmit={handleLogin}>
+//                     <input
+//                         type="email"
+//                         className="form"
+//                         id="email"
+//                         name="email"
+//                         value={email}
+//                         onChange={(e) => setEmail(e.target.value)}
+//                         placeholder="Email"
+//                         required
+//                     />
+//                     <input
+//                         type="password"
+//                         className="form"
+//                         id="password"
+//                         name="password"
+//                         value={password}
+//                         onChange={(e) => setPassword(e.target.value)}
+//                         placeholder="Password"
+//                         required
+//                     />
+//                     <Link to="/forget-password"><label className="right-label">Forget password?</label></Link>
+
+//                     <button type="submit" className="btn btn-primary">Login</button>
+//                     {error && <div className="error-message">{error}</div>}
+
+//                     <Link to="/signup" className="already-registered-text">Go to Signup</Link>
+//                 </form>
+//                 {error && <div className="alert alert-danger mt-3">{error}</div>}
+//             </div>
+//         </div>
+//     );
+// }
+
+// export default Login;

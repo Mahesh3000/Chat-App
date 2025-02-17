@@ -1,141 +1,93 @@
-import axios, { AxiosError } from 'axios';
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import axios from "axios";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
     const navigate = useNavigate();
 
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [profilePic, setProfilePic] = useState<File | null>(null);
+    const [formData, setFormData] = useState({
+        username: "",
+        email: "",
+        password: "",
+        image: null as File | null,
+    });
 
     const [error, setError] = useState<string | null>(null);
 
-    const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const file = e.target.files[0];
-            setProfilePic(file)
-        }
-    }
-
-    console.log('file', profilePic);
-
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, files } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: files ? files[0] : value,
+        }));
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Check if passwords match
-        if (password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('email', email);
-        formData.append('password', password);
-        formData.append('confirmPassword', confirmPassword);
-        if (profilePic) {
-            formData.append('profilePic', profilePic);
-        }
-
+        const submitData = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+            if (value) submitData.append(key, value);
+        });
 
         try {
-            const response = await axios.post('http://localhost:4000/auth/signup', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await axios.post(
+                "http://localhost:5001/auth/register",
+                submitData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
 
             if (response.status === 201) {
-                navigate('/login');
-            }
-            else {
-                setError(response.data.message || "Sign up failed. Please try again.");
-            }
-        } catch (error: unknown) {
-            console.error('Error during signup:', error);
-
-            if (axios.isAxiosError(error)) {
-                // Check if the error has a response
-                if (error.response) {
-                    // Error response data structure example: { message: "Some error message" }
-                    setError(error.response.data.message || "An error occurred during signup. Please try again.");
-                } else {
-                    // If no response, maybe a network error
-                    setError("Network error. Please check your internet connection.");
-                }
+                navigate("/dashboard");
             } else {
-                // If the error isn't an AxiosError, handle it as a generic error
-                setError("An unexpected error occurred. Please try again.");
+                setError(response.data.message || "Sign up failed.");
             }
-
+        } catch (error) {
+            setError(
+                axios.isAxiosError(error)
+                    ? error.response?.data.message || "An error occurred."
+                    : "Unexpected error."
+            );
         }
     };
-
 
     return (
         <div className="containeryash">
             <div className="signup-form">
                 <h2>Sign Up</h2>
                 <form onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="username"
-                        name="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Username"
-                        required
-                    />
-                    <input
-                        type="email"
-                        className="form-control"
-                        id="email"
-                        name="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Email"
-                        required
-                    />
-                    <input
-                        type="password"
-                        className="form-control"
-                        id="password"
-                        name="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
-                        required
-                    />
-                    <input
-                        type="password"
-                        className="form-control"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm Password"
-                        required
-                    />
+                    {["username", "email", "password"].map((field) => (
+                        <input
+                            key={field}
+                            type={field === "password" ? "password" : "text"}
+                            className="form-control"
+                            name={field}
+                            value={formData[field as keyof typeof formData] as string}
+                            onChange={handleChange}
+                            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                            required
+                        />
+                    ))}
                     <input
                         type="file"
                         className="form-control"
-                        id="profilePic"
-                        name="profilePic"
-                        onChange={handleProfilePicChange}
+                        name="image"
+                        onChange={handleChange}
                         accept="image/*"
                     />
-                    <button type="submit" className="btn btn-primary">Sign Up</button>
+                    <button type="submit" className="btn btn-primary">
+                        Sign Up
+                    </button>
                     {error && <div className="error-message">{error}</div>}
-                    <Link to="/login" className="already-registered-text">Go to Login</Link>
+                    <Link to="/login" className="already-registered-text">
+                        Go to Login
+                    </Link>
                 </form>
             </div>
         </div>
     );
-}
+};
 
 export default SignUp;

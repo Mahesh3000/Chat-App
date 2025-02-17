@@ -559,22 +559,9 @@ right: 0;
   align-items: center;
 }
 
-.status-indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  border: 2px solid white; /* Border to separate from avatar */
-}
-
-.status-indicator.online {
-  background-color: green;
-}
-
-.status-indicator.offline {
-  background-color: gray;
+.users-list{
+overflow: auto;
+padding-bottom: 0%;
 }
 
 .timestamp{
